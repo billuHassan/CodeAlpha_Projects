@@ -269,7 +269,7 @@ const ACHIEVEMENTS_DATA = [
 
 class LanguageApp {
   constructor() {
-    this.storageKey = "codealpha_lingua_user";
+    this.storageKey = "rahmour_lingua_user";
     this.currentLang = "es";
     this.currentCategory = "all";
     this.activeTab = "lessons";
