@@ -52,7 +52,7 @@ function generateSeedData() {
 
 class FitnessTrackerApp {
   constructor() {
-    this.storageKey = "codealpha_fitness_data";
+    this.storageKey = "rahmour_fitness_data";
     this.state = this.loadState();
 
     this.cacheDOM();
@@ -518,7 +518,7 @@ class FitnessTrackerApp {
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `PulseFit_Workout_History_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `Rahmour_Fitness_History_${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     this.showToast("Workout history exported to CSV!");
   }
