@@ -1,9 +1,7 @@
 /**
- * BrainSpark Flashcard Quiz App - Core Engine
- * CodeAlpha Internship Task 1
+ * Rahmour Flashcards - Real-Time Learning & Quiz Engine
  */
 
-// Default Decks
 const DEFAULT_DECKS = {
   "web-dev": {
     id: "web-dev",
@@ -88,17 +86,15 @@ const DEFAULT_DECKS = {
   }
 };
 
-// Application State
 class FlashcardApp {
   constructor() {
-    this.storageKey = "codealpha_flashcards_decks";
+    this.storageKey = "rahmour_flashcards_decks";
     this.activeDeckId = "web-dev";
     this.currentIndex = 0;
     this.isFlipped = false;
     this.mode = "study"; // 'study' | 'quiz'
     this.decks = this.loadDecks();
-    
-    // Quiz state
+
     this.quizStats = {
       correct: 0,
       missed: 0,
@@ -120,7 +116,7 @@ class FlashcardApp {
         if (Object.keys(parsed).length > 0) return parsed;
       }
     } catch (e) {
-      console.warn("Could not load from localStorage, falling back to defaults", e);
+      console.warn("Using default decks", e);
     }
     this.saveDecks(DEFAULT_DECKS);
     return JSON.parse(JSON.stringify(DEFAULT_DECKS));
@@ -130,13 +126,13 @@ class FlashcardApp {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(data));
     } catch (e) {
-      console.error("Failed to save to localStorage", e);
+      console.error(e);
     }
   }
 
   cacheDOM() {
-    // Top bar
     this.deckSelect = document.getElementById("deckSelect");
+    this.newDeckBtn = document.getElementById("newDeckBtn");
     this.manageCardsBtn = document.getElementById("manageCardsBtn");
     this.addCardBtn = document.getElementById("addCardBtn");
     this.studyModeBtn = document.getElementById("studyModeBtn");
@@ -147,7 +143,6 @@ class FlashcardApp {
     this.quizTimer = document.getElementById("quizTimer");
     this.timerDisplay = document.getElementById("timerDisplay");
 
-    // Card Stage
     this.emptyDeckState = document.getElementById("emptyDeckState");
     this.cardStage = document.getElementById("cardStage");
     this.flashcardElement = document.getElementById("flashcardElement");
@@ -158,7 +153,6 @@ class FlashcardApp {
     this.editCurrentCardBtn = document.getElementById("editCurrentCardBtn");
     this.editCurrentCardBtnBack = document.getElementById("editCurrentCardBtnBack");
 
-    // Navigation & Assessment
     this.prevBtn = document.getElementById("prevBtn");
     this.flipBtn = document.getElementById("flipBtn");
     this.flipBtnText = document.getElementById("flipBtnText");
@@ -167,12 +161,16 @@ class FlashcardApp {
     this.btnForgot = document.getElementById("btnForgot");
     this.btnKnew = document.getElementById("btnKnew");
 
-    // Auxiliary
     this.shuffleBtn = document.getElementById("shuffleBtn");
     this.resetDeckBtn = document.getElementById("resetDeckBtn");
     this.exportImportBtn = document.getElementById("exportImportBtn");
 
     // Modals
+    this.newDeckModal = document.getElementById("newDeckModal");
+    this.newDeckForm = document.getElementById("newDeckForm");
+    this.newDeckNameInput = document.getElementById("newDeckNameInput");
+    this.newDeckCategoryInput = document.getElementById("newDeckCategoryInput");
+
     this.cardModal = document.getElementById("cardModal");
     this.cardModalTitle = document.getElementById("cardModalTitle");
     this.cardForm = document.getElementById("cardForm");
@@ -198,7 +196,6 @@ class FlashcardApp {
   }
 
   bindEvents() {
-    // Deck selection
     this.deckSelect.addEventListener("change", (e) => {
       this.activeDeckId = e.target.value;
       this.currentIndex = 0;
@@ -206,13 +203,10 @@ class FlashcardApp {
       this.renderCurrentCard();
     });
 
-    // Modes
     this.studyModeBtn.addEventListener("click", () => this.setMode("study"));
     this.quizModeBtn.addEventListener("click", () => this.setMode("quiz"));
 
-    // Card interactions
     this.flashcardElement.addEventListener("click", (e) => {
-      // Avoid flipping if clicking sub-buttons
       if (e.target.closest(".tool-btn")) return;
       this.toggleFlip();
     });
@@ -221,11 +215,9 @@ class FlashcardApp {
     this.prevBtn.addEventListener("click", () => this.prevCard());
     this.nextBtn.addEventListener("click", () => this.nextCard());
 
-    // Quiz assessment
     this.btnKnew.addEventListener("click", () => this.recordQuizAnswer(true));
     this.btnForgot.addEventListener("click", () => this.recordQuizAnswer(false));
 
-    // Aux
     this.shuffleBtn.addEventListener("click", () => this.shuffleCurrentDeck());
     this.resetDeckBtn.addEventListener("click", () => {
       this.currentIndex = 0;
@@ -234,7 +226,6 @@ class FlashcardApp {
       this.showToast("Deck reset to start.");
     });
 
-    // TTS
     this.ttsFrontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.speakText(this.getActiveCard()?.question || "");
@@ -244,7 +235,6 @@ class FlashcardApp {
       this.speakText(this.getActiveCard()?.answer || "");
     });
 
-    // Card editing from card view
     this.editCurrentCardBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const card = this.getActiveCard();
@@ -256,29 +246,21 @@ class FlashcardApp {
       if (card) this.openEditCardModal(card.id);
     });
 
-    // Modal Triggers
+    this.newDeckBtn.addEventListener("click", () => this.openNewDeckModal());
     this.addCardBtn.addEventListener("click", () => this.openAddCardModal());
     this.manageCardsBtn.addEventListener("click", () => this.openManageModal());
     this.exportImportBtn.addEventListener("click", () => this.openExportModal());
 
-    // Card Form submit
+    this.newDeckForm.addEventListener("submit", (e) => this.handleCreateDeck(e));
     this.cardForm.addEventListener("submit", (e) => this.handleSaveCard(e));
-
-    // Search in manage
     this.cardSearchInput.addEventListener("input", (e) => this.filterManageCards(e.target.value));
-
-    // Delete deck
     this.deleteDeckBtn.addEventListener("click", () => this.deleteCurrentDeck());
 
-    // Export & Import
     this.downloadBackupBtn.addEventListener("click", () => this.exportDecksJSON());
     this.importFileInput.addEventListener("change", (e) => this.importDecksJSON(e));
 
-    // Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {
-      // Ignore if user is typing inside an input or textarea
       if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
-
       if (e.code === "Space") {
         e.preventDefault();
         this.toggleFlip();
@@ -335,34 +317,27 @@ class FlashcardApp {
     this.nextBtn.disabled = false;
     this.flipBtn.disabled = false;
 
-    // Boundary check
     if (this.currentIndex < 0) this.currentIndex = 0;
     if (this.currentIndex >= deck.cards.length) this.currentIndex = deck.cards.length - 1;
 
     const card = deck.cards[this.currentIndex];
 
-    // Reset flip visual state
     this.isFlipped = false;
     this.flashcardElement.classList.remove("is-flipped");
     this.flipBtnText.textContent = "Show Answer";
 
-    // Text content
     this.cardQuestionText.textContent = card.question;
     this.cardAnswerText.textContent = card.answer;
 
-    // Counters & Meta
     this.cardCounter.textContent = `Card ${this.currentIndex + 1} / ${deck.cards.length}`;
     this.deckCategoryTag.innerHTML = `<i class="fa-solid fa-tag"></i> ${deck.category || 'General'}`;
 
-    // Progress bar
     const progress = ((this.currentIndex + 1) / deck.cards.length) * 100;
     this.progressBar.style.width = `${progress}%`;
 
-    // Manage buttons state
     this.prevBtn.disabled = this.currentIndex === 0;
     this.nextBtn.disabled = this.currentIndex === deck.cards.length - 1;
 
-    // Update Quiz assessment visibility
     if (this.mode === "quiz") {
       this.quizAssessmentBar.classList.add("hidden");
     }
@@ -428,7 +403,7 @@ class FlashcardApp {
     this.currentIndex = 0;
     this.renderCurrentCard();
     this.startQuizTimer();
-    this.showToast("Quiz mode active! Flip each card and rate your memory.");
+    this.showToast("Quiz challenge started! Flip each card and test your knowledge.");
   }
 
   startQuizTimer() {
@@ -504,7 +479,40 @@ class FlashcardApp {
     window.speechSynthesis.speak(utterance);
   }
 
-  // Modals management
+  openNewDeckModal() {
+    this.newDeckNameInput.value = "";
+    this.newDeckCategoryInput.value = "";
+    this.newDeckModal.classList.remove("hidden");
+    this.newDeckNameInput.focus();
+  }
+
+  closeNewDeckModal() {
+    this.newDeckModal.classList.add("hidden");
+  }
+
+  handleCreateDeck(e) {
+    e.preventDefault();
+    const name = this.newDeckNameInput.value.trim();
+    const category = this.newDeckCategoryInput.value.trim();
+    if (!name) return;
+
+    const deckId = "deck-" + Date.now();
+    this.decks[deckId] = {
+      id: deckId,
+      name,
+      category: category || "General",
+      cards: []
+    };
+
+    this.activeDeckId = deckId;
+    this.currentIndex = 0;
+    this.saveDecks();
+    this.populateDeckSelector();
+    this.renderCurrentCard();
+    this.closeNewDeckModal();
+    this.showToast(`Created new deck "${name}"!`);
+  }
+
   openAddCardModal() {
     this.cardModalTitle.textContent = "Add New Flashcard";
     this.editCardId.value = "";
@@ -540,7 +548,6 @@ class FlashcardApp {
     if (!deck) return;
 
     if (id) {
-      // Edit
       const card = deck.cards.find(c => c.id === id);
       if (card) {
         card.question = q;
@@ -548,7 +555,6 @@ class FlashcardApp {
         this.showToast("Flashcard updated!");
       }
     } else {
-      // Add
       const newCard = {
         id: "card-" + Date.now(),
         question: q,
@@ -633,7 +639,7 @@ class FlashcardApp {
       return;
     }
 
-    if (!confirm(`Are you sure you want to delete the entire deck "${deck.name}"?`)) return;
+    if (!confirm(`Are you sure you want to delete the deck "${deck.name}"?`)) return;
 
     delete this.decks[this.activeDeckId];
     this.activeDeckId = Object.keys(this.decks)[0];
@@ -649,7 +655,7 @@ class FlashcardApp {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.decks, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `BrainSpark_Flashcards_${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute("download", `Rahmour_Flashcards_${new Date().toISOString().slice(0, 10)}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -691,42 +697,32 @@ class FlashcardApp {
   }
 
   escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-      tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag] || tag)
-    );
+    return str.replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag));
   }
 
-  closeCardModal() {
-    this.cardModal.classList.add("hidden");
-  }
-
-  closeManageModal() {
-    this.manageModal.classList.add("hidden");
-  }
-
+  closeCardModal() { this.cardModal.classList.add("hidden"); }
+  closeManageModal() { this.manageModal.classList.add("hidden"); }
   closeExportModal() {
     this.exportModal.classList.add("hidden");
     this.importFileInput.value = "";
   }
-
   closeQuizModal() {
     this.quizResultsModal.classList.add("hidden");
     this.setMode("study");
   }
-
   restartQuiz() {
     this.quizResultsModal.classList.add("hidden");
     this.startQuiz();
   }
 }
 
-// Global modal helpers
+function closeNewDeckModal() { app.closeNewDeckModal(); }
 function closeCardModal() { app.closeCardModal(); }
 function closeManageModal() { app.closeManageModal(); }
 function closeExportModal() { app.closeExportModal(); }
@@ -734,9 +730,7 @@ function closeQuizModal() { app.closeQuizModal(); }
 function restartQuiz() { app.restartQuiz(); }
 function openAddCardModal() { app.openAddCardModal(); }
 
-// Initialize app
 let app;
 document.addEventListener("DOMContentLoaded", () => {
   app = new FlashcardApp();
 });
-

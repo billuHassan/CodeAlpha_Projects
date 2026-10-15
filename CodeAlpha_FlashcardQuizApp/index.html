@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrainSpark Flashcards | CodeAlpha</title>
+  <title>Rahmour Flashcards | Smart Study & Quiz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
       <div class="brand">
         <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
         <div>
-          <h1>BrainSpark <span class="badge">Quiz</span></h1>
-          <p class="subtitle">Smart Flashcard & Study Accelerator</p>
+          <h1>Rahmour <span class="badge">Flashcards</span></h1>
+          <p class="subtitle">Personalized Study & Memory Accelerator</p>
         </div>
       </div>
 
@@ -28,6 +28,10 @@
           <label for="deckSelect"><i class="fa-solid fa-folder-open"></i> Deck:</label>
           <select id="deckSelect" class="select-input"></select>
         </div>
+
+        <button id="newDeckBtn" class="btn btn-secondary" title="Create New Deck">
+          <i class="fa-solid fa-folder-plus"></i> New Deck
+        </button>
 
         <button id="manageCardsBtn" class="btn btn-secondary" title="Manage & Edit Cards">
           <i class="fa-solid fa-list-check"></i> Manage Cards
@@ -51,7 +55,7 @@
       </div>
 
       <div class="deck-meta">
-        <span class="meta-tag" id="cardCounter">Card 1 / 10</span>
+        <span class="meta-tag" id="cardCounter">Card 1 / 5</span>
         <span class="meta-tag" id="deckCategoryTag"><i class="fa-solid fa-tag"></i> Web Dev</span>
         <div id="quizTimer" class="quiz-timer hidden">
           <i class="fa-solid fa-clock"></i> <span id="timerDisplay">00:00</span>
@@ -61,7 +65,7 @@
 
     <!-- Progress Bar -->
     <div class="progress-container">
-      <div id="progressBar" class="progress-bar" style="width: 10%;"></div>
+      <div id="progressBar" class="progress-bar" style="width: 20%;"></div>
     </div>
 
     <!-- Main Flashcard Workspace -->
@@ -201,6 +205,30 @@
       </div>
     </div>
 
+    <!-- Create Deck Modal -->
+    <div id="newDeckModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-folder-plus"></i> Create New Deck</h2>
+          <button class="modal-close-btn" onclick="closeNewDeckModal()">&times;</button>
+        </div>
+        <form id="newDeckForm">
+          <div class="form-group">
+            <label for="newDeckNameInput">Deck Name *</label>
+            <input type="text" id="newDeckNameInput" class="form-control" placeholder="e.g. Machine Learning Basics" required>
+          </div>
+          <div class="form-group">
+            <label for="newDeckCategoryInput">Category / Subject *</label>
+            <input type="text" id="newDeckCategoryInput" class="form-control" placeholder="e.g. AI / Technology" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeNewDeckModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Deck</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Add/Edit Card Modal -->
     <div id="cardModal" class="modal-overlay hidden">
       <div class="modal-card">
@@ -212,11 +240,11 @@
           <input type="hidden" id="editCardId">
           <div class="form-group">
             <label for="cardQuestionInput">Question / Prompt *</label>
-            <textarea id="cardQuestionInput" rows="3" class="form-control" placeholder="e.g. What is the Virtual DOM in React?" required></textarea>
+            <textarea id="cardQuestionInput" rows="3" class="form-control" placeholder="Enter question..." required></textarea>
           </div>
           <div class="form-group">
             <label for="cardAnswerInput">Answer / Explanation *</label>
-            <textarea id="cardAnswerInput" rows="4" class="form-control" placeholder="e.g. A lightweight in-memory representation of the actual DOM used for high performance UI updates." required></textarea>
+            <textarea id="cardAnswerInput" rows="4" class="form-control" placeholder="Enter answer or explanation..." required></textarea>
           </div>
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="closeCardModal()">Cancel</button>
@@ -259,7 +287,7 @@
           <button class="modal-close-btn" onclick="closeExportModal()">&times;</button>
         </div>
         <div class="export-body">
-          <p>Export your current flashcards to a JSON file or import a deck file from another computer.</p>
+          <p>Export your current flashcards to a JSON file or import a deck file from another device.</p>
           <div class="export-actions">
             <button class="btn btn-primary" id="downloadBackupBtn">
               <i class="fa-solid fa-download"></i> Download All Decks (JSON)
@@ -276,11 +304,10 @@
     <div id="toastNotification" class="toast hidden"></div>
 
     <footer class="app-footer">
-      <p>CodeAlpha App Development Internship &bull; Task 1: Flashcard Quiz App</p>
+      <p>Rahmour Flashcards &bull; Built with HTML5, CSS3 & Modern JavaScript</p>
     </footer>
   </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-
