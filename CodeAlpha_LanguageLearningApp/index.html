@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinguaVibe | Interactive Language Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-earth-americas"></i></div>
+        <div>
+          <h1>LinguaVibe</h1>
+          <p class="subtitle">Interactive Language Learning & Master Quizzes</p>
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <!-- Language Selector -->
+        <div class="lang-selector-wrap">
+          <label for="langSelect"><i class="fa-solid fa-language"></i></label>
+          <select id="langSelect" class="lang-select">
+            <option value="es">🇪🇸 Spanish (Español)</option>
+            <option value="fr">🇫🇷 French (Français)</option>
+            <option value="de">🇩🇪 German (Deutsch)</option>
+            <option value="ja">🇯🇵 Japanese (日本語)</option>
+          </select>
+        </div>
+
+        <!-- Gamification Metrics -->
+        <div class="stat-pill" title="Daily Streak">
+          <i class="fa-solid fa-fire text-amber"></i>
+          <span><strong id="streakDisplay">3</strong> Days</span>
+        </div>
+
+        <div class="stat-pill" title="Experience Points">
+          <i class="fa-solid fa-bolt text-indigo"></i>
+          <span><strong id="xpDisplay">240</strong> XP</span>
+        </div>
+
+        <div class="stat-pill level-pill" title="Current Level">
+          <span class="level-badge" id="levelDisplay">Lvl 2</span>
+        </div>
+
+        <button id="achievementsBtn" class="btn btn-icon" title="View Badges & Achievements">
+          <i class="fa-solid fa-award"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="lessons">
+        <i class="fa-solid fa-book-open"></i> Daily Lessons
+      </button>
+      <button class="nav-tab" data-tab="quizzes">
+        <i class="fa-solid fa-brain"></i> Practice Quizzes
+      </button>
+      <button class="nav-tab" data-tab="dictionary">
+        <i class="fa-solid fa-spell-check"></i> Word Bank & Audio
+      </button>
+    </nav>
+
+    <!-- Category Selector Filter -->
+    <div class="category-bar" id="categoryBar">
+      <button class="cat-pill active" data-cat="all">All Topics</button>
+      <button class="cat-pill" data-cat="basics"><i class="fa-solid fa-hand-wave"></i> Greetings & Basics</button>
+      <button class="cat-pill" data-cat="travel"><i class="fa-solid fa-plane"></i> Travel & Directions</button>
+      <button class="cat-pill" data-cat="food"><i class="fa-solid fa-utensils"></i> Food & Dining</button>
+      <button class="cat-pill" data-cat="grammar"><i class="fa-solid fa-shapes"></i> Grammar Essentials</button>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="main-content">
+      <!-- TAB 1: DAILY LESSONS (FLASHCARDS) -->
+      <section id="tabLessons" class="tab-panel active">
+        <div class="lesson-header">
+          <div class="lesson-progress-text">
+            Lesson Progress: <span id="lessonCounter">Card 1 / 8</span>
+          </div>
+          <div class="lesson-tools">
+            <button class="tool-btn" id="slowAudioBtn" title="Toggle Slow Pronunciation Speed">
+              <i class="fa-solid fa-turtle"></i> Slow Audio: <span id="slowAudioStatus">Off</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="lesson-progress-bar-wrap">
+          <div id="lessonProgressBar" class="lesson-progress-fill" style="width: 12.5%;"></div>
+        </div>
+
+        <!-- Interactive Study Card -->
+        <div class="study-card-outer">
+          <div class="study-card">
+            <div class="study-card-top">
+              <span class="category-chip" id="cardCategory">Greetings</span>
+              <button class="btn-audio-circle" id="cardSpeakBtn" title="Listen Pronunciation">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+
+            <div class="study-card-body">
+              <h2 class="target-word" id="cardTargetWord">¡Hola!</h2>
+              <p class="phonetic-text" id="cardPhonetic">[OH-lah]</p>
+
+              <div class="translation-box">
+                <span class="translation-label">English Translation</span>
+                <p class="english-translation" id="cardTranslation">Hello!</p>
+              </div>
+
+              <div class="example-box">
+                <span class="example-label"><i class="fa-solid fa-quote-left"></i> Example Sentence</span>
+                <p class="target-sentence" id="cardTargetSentence">¡Hola! ¿Cómo estás hoy?</p>
+                <p class="english-sentence" id="cardEnglishSentence">Hello! How are you today?</p>
+              </div>
+            </div>
+
+            <!-- Card Navigation -->
+            <div class="study-card-nav">
+              <button id="lessonPrevBtn" class="nav-control-btn">
+                <i class="fa-solid fa-chevron-left"></i> Previous
+              </button>
+
+              <button id="lessonMarkLearnedBtn" class="nav-control-btn btn-learned">
+                <i class="fa-solid fa-check"></i> Mastered (+10 XP)
+              </button>
+
+              <button id="lessonNextBtn" class="nav-control-btn">
+                Next <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: PRACTICE QUIZZES -->
+      <section id="tabQuizzes" class="tab-panel">
+        <div class="quiz-selector-bar">
+          <button class="quiz-type-btn active" data-quiz="mcq">
+            <i class="fa-solid fa-list-ol"></i> Multiple Choice
+          </button>
+          <button class="quiz-type-btn" data-quiz="matching">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> Word Match
+          </button>
+          <button class="quiz-type-btn" data-quiz="listening">
+            <i class="fa-solid fa-headphones"></i> Audio Listening
+          </button>
+        </div>
+
+        <!-- Quiz Container: MCQ -->
+        <div id="quizMcqContainer" class="quiz-box">
+          <div class="quiz-status-row">
+            <span class="quiz-question-num" id="mcqProgress">Question 1 / 5</span>
+            <span class="quiz-score-badge">Score: <strong id="mcqScore">0</strong></span>
+          </div>
+
+          <div class="quiz-prompt-card">
+            <div id="audioListeningPrompt" class="audio-prompt hidden">
+              <button class="btn-audio-large" id="playQuizAudioBtn" title="Play Sound">
+                <i class="fa-solid fa-volume-high"></i> Listen Closely
+              </button>
+            </div>
+            <p class="quiz-instruction" id="quizInstruction">Choose the correct translation for:</p>
+            <h3 class="quiz-target-word" id="quizTargetWord">Por favor</h3>
+          </div>
+
+          <!-- 4 Multiple Choice Options -->
+          <div class="mcq-options-grid" id="mcqOptionsGrid">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <div class="quiz-feedback-bar hidden" id="quizFeedbackBar">
+            <div id="quizFeedbackMessage" class="feedback-msg">Correct! +15 XP</div>
+            <button class="btn btn-primary" id="quizNextBtn">Continue <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Quiz Container: Matching Pairs -->
+        <div id="quizMatchingContainer" class="quiz-box hidden">
+          <div class="matching-header">
+            <h4><i class="fa-solid fa-link"></i> Match the pairs by tapping one from each column:</h4>
+            <span class="quiz-score-badge">Matched: <span id="matchScore">0</span> / 4</span>
+          </div>
+          <div class="matching-grid">
+            <div class="match-column" id="matchColForeign">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="match-column" id="matchColEnglish">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+          <button class="btn btn-primary w-100" id="resetMatchingBtn" style="margin-top: 18px;">
+            <i class="fa-solid fa-rotate"></i> New Matching Round
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 3: WORD BANK & VOCABULARY DICTIONARY -->
+      <section id="tabDictionary" class="tab-panel">
+        <div class="dict-toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="dictSearchInput" placeholder="Search words, translations, or phonetic sounds...">
+          </div>
+          <span class="dict-count" id="dictCount">Showing 12 words</span>
+        </div>
+
+        <div class="word-grid" id="dictionaryWordGrid">
+          <!-- Dynamically populated cards with audio triggers -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-trophy highlight-gold"></i> Badges & Milestones</h2>
+          <button class="modal-close" onclick="closeAchievementsModal()">&times;</button>
+        </div>
+        <div class="achievements-list" id="achievementsList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Completed Victory Modal -->
+    <div id="victoryModal" class="modal-overlay hidden">
+      <div class="modal-card text-center">
+        <div class="victory-icon"><i class="fa-solid fa-champagne-glasses"></i></div>
+        <h2>Fantastic Progress!</h2>
+        <p class="subtitle" id="victorySubtitle">You completed the practice test successfully!</p>
+        <div class="xp-earned-badge">+<span id="victoryXp">50</span> XP Earned</div>
+        <div class="modal-actions justify-center">
+          <button class="btn btn-primary" onclick="closeVictoryModal()">Continue Learning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="langToast" class="toast hidden"></div>
+
+    <footer class="app-footer">
+      <p>CodeAlpha App Development Internship &bull; Task 4: Language Learning App</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
