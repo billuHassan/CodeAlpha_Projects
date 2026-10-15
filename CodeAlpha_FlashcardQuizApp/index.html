@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainSpark Flashcards | CodeAlpha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div>
+          <h1>BrainSpark <span class="badge">Quiz</span></h1>
+          <p class="subtitle">Smart Flashcard & Study Accelerator</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Deck Selector -->
+        <div class="deck-selector-wrap">
+          <label for="deckSelect"><i class="fa-solid fa-folder-open"></i> Deck:</label>
+          <select id="deckSelect" class="select-input"></select>
+        </div>
+
+        <button id="manageCardsBtn" class="btn btn-secondary" title="Manage & Edit Cards">
+          <i class="fa-solid fa-list-check"></i> Manage Cards
+        </button>
+
+        <button id="addCardBtn" class="btn btn-primary" title="Add New Card">
+          <i class="fa-solid fa-plus"></i> Add Card
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub-bar: Modes & Controls -->
+    <div class="sub-bar">
+      <div class="mode-toggles">
+        <button id="studyModeBtn" class="mode-btn active" data-mode="study">
+          <i class="fa-solid fa-book-open"></i> Study Mode
+        </button>
+        <button id="quizModeBtn" class="mode-btn" data-mode="quiz">
+          <i class="fa-solid fa-stopwatch-20"></i> Quiz Challenge
+        </button>
+      </div>
+
+      <div class="deck-meta">
+        <span class="meta-tag" id="cardCounter">Card 1 / 10</span>
+        <span class="meta-tag" id="deckCategoryTag"><i class="fa-solid fa-tag"></i> Web Dev</span>
+        <div id="quizTimer" class="quiz-timer hidden">
+          <i class="fa-solid fa-clock"></i> <span id="timerDisplay">00:00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar" style="width: 10%;"></div>
+    </div>
+
+    <!-- Main Flashcard Workspace -->
+    <main class="flashcard-workspace">
+      <!-- Empty State -->
+      <div id="emptyDeckState" class="empty-state hidden">
+        <i class="fa-regular fa-folder-open empty-icon"></i>
+        <h3>This deck is empty</h3>
+        <p>Create your first flashcard to start learning or choose a different deck.</p>
+        <button class="btn btn-primary" onclick="openAddCardModal()">
+          <i class="fa-solid fa-plus"></i> Create Flashcard
+        </button>
+      </div>
+
+      <!-- Flashcard 3D Card Area -->
+      <div id="cardStage" class="card-stage">
+        <div class="flashcard-outer" id="flashcardElement" tabindex="0" role="button" aria-label="Flashcard. Click or press space to flip.">
+          <div class="flashcard-inner">
+            <!-- Front Face -->
+            <div class="flashcard-face card-front">
+              <div class="card-header-bar">
+                <span class="face-badge front-badge"><i class="fa-solid fa-question-circle"></i> Question</span>
+                <div class="card-tools">
+                  <button class="tool-btn" id="ttsFrontBtn" title="Listen Question" aria-label="Listen Question">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <button class="tool-btn" id="editCurrentCardBtn" title="Edit Card" aria-label="Edit Card">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-content">
+                <p id="cardQuestionText">Loading question...</p>
+              </div>
+              <div class="card-footer-bar">
+                <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Click card or press "Show Answer"</span>
+              </div>
+            </div>
+
+            <!-- Back Face -->
+            <div class="flashcard-face card-back">
+              <div class="card-header-bar">
+                <span class="face-badge back-badge"><i class="fa-solid fa-circle-check"></i> Answer</span>
+                <div class="card-tools">
+                  <button class="tool-btn" id="ttsBackBtn" title="Listen Answer" aria-label="Listen Answer">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <button class="tool-btn" id="editCurrentCardBtnBack" title="Edit Card" aria-label="Edit Card">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-content">
+                <p id="cardAnswerText">Loading answer...</p>
+              </div>
+              <div class="card-footer-bar">
+                <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Click to flip back to question</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Self-Assessment Buttons in Quiz Mode -->
+        <div id="quizAssessmentBar" class="assessment-bar hidden">
+          <button id="btnForgot" class="btn btn-outline-danger">
+            <i class="fa-solid fa-xmark"></i> Need Practice
+          </button>
+          <button id="btnKnew" class="btn btn-outline-success">
+            <i class="fa-solid fa-check"></i> Mastered!
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation & Controls -->
+      <nav class="card-navigation">
+        <button id="prevBtn" class="nav-btn" title="Previous Card (Left Arrow)">
+          <i class="fa-solid fa-chevron-left"></i> Previous
+        </button>
+
+        <button id="flipBtn" class="nav-btn btn-flip" title="Show Answer / Flip (Spacebar)">
+          <i class="fa-solid fa-rotate"></i> <span id="flipBtnText">Show Answer</span>
+        </button>
+
+        <button id="nextBtn" class="nav-btn" title="Next Card (Right Arrow)">
+          Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </nav>
+
+      <!-- Auxiliary Bar: Shuffle, Keyboard Shortcuts, Export -->
+      <div class="aux-bar">
+        <button id="shuffleBtn" class="btn btn-ghost" title="Shuffle Deck">
+          <i class="fa-solid fa-shuffle"></i> Shuffle
+        </button>
+        <button id="resetDeckBtn" class="btn btn-ghost" title="Restart Deck">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Restart
+        </button>
+        <button id="exportImportBtn" class="btn btn-ghost" title="Export / Import Decks">
+          <i class="fa-solid fa-file-arrow-down"></i> Backup / Export
+        </button>
+        <div class="kbd-shortcuts-tip">
+          <span class="kbd">←</span> <span class="kbd">→</span> Navigate &bull; <span class="kbd">Space</span> Flip
+        </div>
+      </div>
+    </main>
+
+    <!-- Quiz Results Modal -->
+    <div id="quizResultsModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-trophy highlight-gold"></i> Quiz Complete!</h2>
+          <button class="modal-close-btn" onclick="closeQuizModal()">&times;</button>
+        </div>
+        <div class="quiz-score-card">
+          <div class="score-circle">
+            <span id="quizScorePercentage">100%</span>
+            <span class="score-label">Accuracy</span>
+          </div>
+          <div class="score-stats">
+            <div class="stat-item">
+              <span class="stat-number text-success" id="quizCorrectCount">0</span>
+              <span class="stat-name">Mastered</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number text-danger" id="quizMissedCount">0</span>
+              <span class="stat-name">Need Practice</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="quizTimeTaken">0s</span>
+              <span class="stat-name">Time</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeQuizModal()">Back to Study</button>
+          <button class="btn btn-primary" onclick="restartQuiz()"><i class="fa-solid fa-arrow-rotate-left"></i> Retake Quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Card Modal -->
+    <div id="cardModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="cardModalTitle">Add New Flashcard</h2>
+          <button class="modal-close-btn" onclick="closeCardModal()">&times;</button>
+        </div>
+        <form id="cardForm">
+          <input type="hidden" id="editCardId">
+          <div class="form-group">
+            <label for="cardQuestionInput">Question / Prompt *</label>
+            <textarea id="cardQuestionInput" rows="3" class="form-control" placeholder="e.g. What is the Virtual DOM in React?" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="cardAnswerInput">Answer / Explanation *</label>
+            <textarea id="cardAnswerInput" rows="4" class="form-control" placeholder="e.g. A lightweight in-memory representation of the actual DOM used for high performance UI updates." required></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeCardModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveCardBtn">Save Flashcard</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Manage Cards / Deck Modal -->
+    <div id="manageModal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-sliders"></i> Manage Cards in Current Deck</h2>
+          <button class="modal-close-btn" onclick="closeManageModal()">&times;</button>
+        </div>
+        <div class="manage-toolbar">
+          <div class="search-input-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="cardSearchInput" placeholder="Search questions or answers...">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddCardModal()">
+            <i class="fa-solid fa-plus"></i> Add Card
+          </button>
+          <button class="btn btn-outline-danger btn-sm" id="deleteDeckBtn">
+            <i class="fa-solid fa-trash"></i> Delete Deck
+          </button>
+        </div>
+        <div class="manage-list-container" id="manageCardsList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Export / Import Modal -->
+    <div id="exportModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-file-export"></i> Backup & Transfer Decks</h2>
+          <button class="modal-close-btn" onclick="closeExportModal()">&times;</button>
+        </div>
+        <div class="export-body">
+          <p>Export your current flashcards to a JSON file or import a deck file from another computer.</p>
+          <div class="export-actions">
+            <button class="btn btn-primary" id="downloadBackupBtn">
+              <i class="fa-solid fa-download"></i> Download All Decks (JSON)
+            </button>
+          </div>
+          <hr class="divider">
+          <h4>Import Flashcards</h4>
+          <input type="file" id="importFileInput" accept=".json" class="file-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast hidden"></div>
+
+    <footer class="app-footer">
+      <p>CodeAlpha App Development Internship &bull; Task 1: Flashcard Quiz App</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
