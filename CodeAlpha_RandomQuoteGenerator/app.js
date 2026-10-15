@@ -150,9 +150,9 @@ const DEFAULT_QUOTES = [
 
 class QuoteApp {
   constructor() {
-    this.storageKeyQuotes = "codealpha_quotes_database";
-    this.storageKeyFavs = "codealpha_quotes_favorites";
-    this.storageKeyTheme = "codealpha_quotes_theme";
+    this.storageKeyQuotes = "rahmour_quotes_database";
+    this.storageKeyFavs = "rahmour_quotes_favorites";
+    this.storageKeyTheme = "rahmour_quotes_theme";
 
     this.quotes = this.loadQuotes();
     this.favorites = this.loadFavorites();
@@ -570,8 +570,8 @@ class QuoteApp {
 
     // Branding Footer
     ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-    ctx.fillText("AuraQuotes • CodeAlpha Internship", width / 2, height - 100);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+    ctx.fillText("Rahmour Quotes", width / 2, height - 100);
 
     // Download PNG
     const link = document.createElement("a");
