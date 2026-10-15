@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraQuotes | Clean & Smart Quote Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="cosmic">
+  <div class="ambient-glow"></div>
+
+  <div class="app-container">
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-feather-pointed"></i></span>
+        <div>
+          <h1>AuraQuotes</h1>
+          <p class="tagline">Daily Inspiration & Wisdom</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Theme Selector -->
+        <div class="control-group">
+          <label for="themeSelect" class="sr-only">Theme</label>
+          <select id="themeSelect" class="theme-select" title="Switch Theme">
+            <option value="cosmic">🌌 Cosmic Indigo</option>
+            <option value="emerald">🍃 Emerald Forest</option>
+            <option value="sunset">🌅 Sunset Rose</option>
+            <option value="cyberpunk">⚡ Neon Cyber</option>
+            <option value="minimal">📜 Minimal Monochrome</option>
+          </select>
+        </div>
+
+        <!-- Favorites Button -->
+        <button id="viewFavoritesBtn" class="btn btn-icon" title="Saved Favorites" aria-label="Favorites">
+          <i class="fa-solid fa-heart"></i>
+          <span id="favBadge" class="badge-count hidden">0</span>
+        </button>
+
+        <!-- Add Custom Quote -->
+        <button id="addQuoteModalBtn" class="btn btn-icon" title="Add Custom Quote" aria-label="Add Quote">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Category Filter Bar -->
+    <div class="category-tabs" id="categoryTabs">
+      <button class="cat-pill active" data-cat="all">All</button>
+      <button class="cat-pill" data-cat="tech"><i class="fa-solid fa-code"></i> Tech & Code</button>
+      <button class="cat-pill" data-cat="inspirational"><i class="fa-solid fa-bolt"></i> Inspiration</button>
+      <button class="cat-pill" data-cat="philosophy"><i class="fa-solid fa-landmark"></i> Philosophy</button>
+      <button class="cat-pill" data-cat="success"><i class="fa-solid fa-trophy"></i> Success</button>
+      <button class="cat-pill" data-cat="mindfulness"><i class="fa-solid fa-spa"></i> Mindfulness</button>
+    </div>
+
+    <!-- Main Quote Card -->
+    <main class="quote-card-wrapper">
+      <article class="quote-card" id="quoteCard">
+        <div class="quote-card-header">
+          <span class="category-indicator" id="quoteCategory">Inspiration</span>
+          <div class="sound-wave hidden" id="soundWave">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div class="quote-body">
+          <i class="fa-solid fa-quote-left quote-mark quote-mark-start"></i>
+          <blockquote id="quoteText" class="quote-text">
+            Simplicity is prerequisite for reliability.
+          </blockquote>
+          <i class="fa-solid fa-quote-right quote-mark quote-mark-end"></i>
+        </div>
+
+        <div class="quote-author-area">
+          <div class="author-line"></div>
+          <p id="quoteAuthor" class="quote-author">— Edsger W. Dijkstra</p>
+          <p id="quoteAuthorBio" class="quote-author-bio">Pioneer of Computer Science</p>
+        </div>
+
+        <!-- Quote Quick Utilities -->
+        <div class="quote-actions-row">
+          <button id="favCurrentBtn" class="action-btn" title="Save to Favorites" aria-label="Bookmark quote">
+            <i class="fa-regular fa-heart" id="favIcon"></i>
+            <span class="action-label">Favorite</span>
+          </button>
+
+          <button id="ttsBtn" class="action-btn" title="Read Quote Aloud" aria-label="Listen to quote">
+            <i class="fa-solid fa-volume-high"></i>
+            <span class="action-label">Listen</span>
+          </button>
+
+          <button id="copyBtn" class="action-btn" title="Copy Quote to Clipboard" aria-label="Copy quote">
+            <i class="fa-solid fa-copy"></i>
+            <span class="action-label">Copy</span>
+          </button>
+
+          <!-- Social Share Dropdown -->
+          <div class="share-dropdown-wrap">
+            <button id="shareMenuBtn" class="action-btn" title="Share Quote" aria-label="Share">
+              <i class="fa-solid fa-share-nodes"></i>
+              <span class="action-label">Share</span>
+            </button>
+            <div id="shareMenu" class="share-popover hidden">
+              <button class="share-option" id="shareTwitterBtn">
+                <i class="fa-brands fa-x-twitter"></i> Twitter / X
+              </button>
+              <button class="share-option" id="shareLinkedInBtn">
+                <i class="fa-brands fa-linkedin"></i> LinkedIn
+              </button>
+              <button class="share-option" id="shareWhatsAppBtn">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+              </button>
+              <button class="share-option" id="shareNativeBtn">
+                <i class="fa-solid fa-share"></i> Device Share
+              </button>
+            </div>
+          </div>
+
+          <button id="downloadImageBtn" class="action-btn" title="Download as Image (PNG)" aria-label="Download image">
+            <i class="fa-solid fa-image"></i>
+            <span class="action-label">Image</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- Primary Action: New Quote Button -->
+      <div class="primary-controls">
+        <button id="newQuoteBtn" class="btn btn-primary-pulse" title="Generate New Quote">
+          <i class="fa-solid fa-shuffle"></i> New Quote
+        </button>
+
+        <button id="autoPlayBtn" class="btn btn-outline" title="Cycle quotes automatically">
+          <i class="fa-solid fa-play"></i> Auto-Play (Off)
+        </button>
+      </div>
+    </main>
+
+    <!-- Hidden Canvas for Quote Card Image Generation -->
+    <canvas id="quoteCanvas" width="1080" height="1080" style="display:none;"></canvas>
+
+    <!-- Favorites Drawer / Modal -->
+    <div id="favoritesModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-heart" style="color: #f43f5e;"></i> Saved Quotes</h2>
+          <button class="close-btn" onclick="closeFavoritesModal()">&times;</button>
+        </div>
+        <div id="favoritesList" class="favorites-list">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeFavoritesModal()">Close</button>
+          <button class="btn btn-outline-danger" id="clearFavoritesBtn">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Custom Quote Modal -->
+    <div id="addQuoteModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-pen-nib"></i> Add Custom Quote</h2>
+          <button class="close-btn" onclick="closeAddQuoteModal()">&times;</button>
+        </div>
+        <form id="customQuoteForm">
+          <div class="form-group">
+            <label for="customQuoteText">Quote Text *</label>
+            <textarea id="customQuoteText" class="input-field" rows="3" placeholder="Enter memorable quote..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="customAuthorText">Author Name *</label>
+            <input type="text" id="customAuthorText" class="input-field" placeholder="e.g. Steve Jobs" required>
+          </div>
+          <div class="form-group">
+            <label for="customCategorySelect">Category</label>
+            <select id="customCategorySelect" class="input-field">
+              <option value="inspirational">Inspiration</option>
+              <option value="tech">Tech & Code</option>
+              <option value="philosophy">Philosophy</option>
+              <option value="success">Success</option>
+              <option value="mindfulness">Mindfulness</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeAddQuoteModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Quote</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>CodeAlpha App Development Internship &bull; Task 2: Random Quote Generator</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
